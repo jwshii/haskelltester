@@ -78,14 +78,8 @@ total p = testPoints p + manualPoints p
 doTest :: (Test,Int) -> IO (String,Int)
 doTest (test, points) = do
   Counts{..} <- runTestTT test
-  let correct = cases - errors - failures
-      pct     = fromIntegral correct / fromIntegral cases :: Double
-      ptFrac  = fromIntegral points * pct
-      ptRound = round ptFrac
-      ptFloor = floor ptFrac
-      -- Don't allow a perfect score unless all the test cases really pass
-      pt | ptRound == points && correct /= cases = ptFloor
-         | otherwise                             = ptRound
+  let incorrect = errors + failures
+      pt = if incorrect > 0 then 0 else points
   return (name test ++ ": " ++ show pt , pt)
   where
     name (TestLabel s _) = s
